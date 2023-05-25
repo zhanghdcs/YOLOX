@@ -67,7 +67,8 @@ class AnnotationTransform(object):
                 # scale height or width
                 # cur_pt = cur_pt / width if i % 2 == 0 else cur_pt / height
                 bndbox.append(cur_pt)
-            label_idx = self.class_to_ind[name]
+            # label_idx = self.class_to_ind[name]
+            label_idx = 0
             bndbox.append(label_idx)
             res = np.vstack((res, bndbox))  # [xmin, ymin, xmax, ymax, label_ind]
             # img_id = target.find('filename').text[:-4]
@@ -123,19 +124,22 @@ class VOCDetection(CacheDataset):
         ]
         self.class_ids = list(range(len(VOC_CLASSES)))
         self.ids = list()
-        for (year, name) in image_sets:
-            self._year = year
-            rootpath = os.path.join(self.root, "VOC" + year)
+        for (name) in image_sets:
+            # self._year = year
+            # rootpath = os.path.join(self.root, "VOC" + year)
+            rootpath = self.root
             for line in open(
                 os.path.join(rootpath, "ImageSets", "Main", name + ".txt")
             ):
                 self.ids.append((rootpath, line.strip()))
         self.num_imgs = len(self.ids)
+        # print(self.ids)
 
         self.annotations = self._load_coco_annotations()
-
+        # print((self._imgpath % self.ids[0]))
+        # print((self._imgpath % self.ids[0]).split(self.root + "\\"))
         path_filename = [
-            (self._imgpath % self.ids[i]).split(self.root + "/")[1]
+            (self._imgpath % self.ids[i]).split(self.root + "\\")[1]
             for i in range(self.num_imgs)
         ]
         super().__init__(
@@ -244,7 +248,8 @@ class VOCDetection(CacheDataset):
 
     def _get_voc_results_file_template(self):
         filename = "comp4_det_test" + "_{:s}.txt"
-        filedir = os.path.join(self.root, "results", "VOC" + self._year, "Main")
+        # filedir = os.path.join(self.root, "results", "VOC" + self._year, "Main")
+        filedir = os.path.join(self.root, "results")
         if not os.path.exists(filedir):
             os.makedirs(filedir)
         path = os.path.join(filedir, filename)
@@ -276,18 +281,19 @@ class VOCDetection(CacheDataset):
                         )
 
     def _do_python_eval(self, output_dir="output", iou=0.5):
-        rootpath = os.path.join(self.root, "VOC" + self._year)
+        # rootpath = os.path.join(self.root, "VOC" + self._year)
+        rootpath = self.root
         name = self.image_set[0][1]
         annopath = os.path.join(rootpath, "Annotations", "{:s}.xml")
         imagesetfile = os.path.join(rootpath, "ImageSets", "Main", name + ".txt")
         cachedir = os.path.join(
-            self.root, "annotations_cache", "VOC" + self._year, name
+            self.root, "annotations_cache"
         )
         if not os.path.exists(cachedir):
             os.makedirs(cachedir)
         aps = []
         # The PASCAL VOC metric changed in 2010
-        use_07_metric = True if int(self._year) < 2010 else False
+        use_07_metric = True 
         print("Eval IoU : {:.2f}".format(iou))
         if output_dir is not None and not os.path.isdir(output_dir):
             os.mkdir(output_dir)
