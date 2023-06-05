@@ -18,7 +18,7 @@ def makexml(txtPath, xmlPath, picPath):  # 读取txt路径，xml保存路径，�
             xmlBuilder.appendChild(annotation)
             txtFile=open(txtPath+name)
             txtList = txtFile.readlines()
-            img = cv2.imread(picPath+name[0:-4]+".jpg")
+            img = cv2.imread(picPath+name[0:-4]+".jpeg")
             Pheight, Pwidth, Pdepth=img.shape
             flag = 0
             for i in txtList:
@@ -30,7 +30,7 @@ def makexml(txtPath, xmlPath, picPath):  # 读取txt路径，xml保存路径，�
                 annotation.appendChild(folder)
                 if flag == 1:
                     filename = xmlBuilder.createElement("filename")  # filename标签
-                    filenameContent = xmlBuilder.createTextNode(name[0:-4]+".jpg")
+                    filenameContent = xmlBuilder.createTextNode(name[0:-4]+".jpeg")
                     filename.appendChild(filenameContent)
                     annotation.appendChild(filename)
 
@@ -96,4 +96,4 @@ def makexml(txtPath, xmlPath, picPath):  # 读取txt路径，xml保存路径，�
             f.close()
 
 if __name__ == "__main__":
-    makexml("../datasets/thermal_person/labels/val/","../datasets/thermal_person/labels/val_xml/","../datasets/thermal_person/images/val/")
+    makexml("../datasets/FLIR_done/labels/train/","../datasets/FLIR_done/labels/train_xml/","../datasets/FLIR_done/images/train/")

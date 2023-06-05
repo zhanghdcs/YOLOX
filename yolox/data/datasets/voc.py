@@ -72,7 +72,8 @@ class AnnotationTransform(object):
             bndbox.append(label_idx)
             res = np.vstack((res, bndbox))  # [xmin, ymin, xmax, ymax, label_ind]
             # img_id = target.find('filename').text[:-4]
-
+        if target is None:
+            print("None")
         width = int(target.find("size").find("width").text)
         height = int(target.find("size").find("height").text)
         img_info = (height, width)
@@ -117,13 +118,14 @@ class VOCDetection(CacheDataset):
         self.target_transform = target_transform
         self.name = dataset_name
         self._annopath = os.path.join("%s", "Annotations", "%s.xml")
-        self._imgpath = os.path.join("%s", "JPEGImages", "%s.jpg")
+        self._imgpath = os.path.join("%s", "JPEGImages", "%s.jpeg")
         self._classes = VOC_CLASSES
         self.cats = [
             {"id": idx, "name": val} for idx, val in enumerate(VOC_CLASSES)
         ]
         self.class_ids = list(range(len(VOC_CLASSES)))
         self.ids = list()
+        print(image_sets)
         for (name) in image_sets:
             # self._year = year
             # rootpath = os.path.join(self.root, "VOC" + year)
@@ -283,8 +285,10 @@ class VOCDetection(CacheDataset):
     def _do_python_eval(self, output_dir="output", iou=0.5):
         # rootpath = os.path.join(self.root, "VOC" + self._year)
         rootpath = self.root
-        name = self.image_set[0][1]
-        annopath = os.path.join(rootpath, "Annotations", "{:s}.xml")
+        # name = self.image_set[0][1]
+        name = self.image_set[0]
+        # annopath = os.path.join(rootpath, "Annotations", "{:s}.xml")
+        annopath = os.path.join(rootpath, "Annotations")
         imagesetfile = os.path.join(rootpath, "ImageSets", "Main", name + ".txt")
         cachedir = os.path.join(
             self.root, "annotations_cache"
